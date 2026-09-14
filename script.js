@@ -59,7 +59,7 @@
     window.addEventListener('resize', cacheEyeCenters);
     function moveEye(entry, mouseX, mouseY){
       var angle = Math.atan2(mouseY-entry.cy, mouseX-entry.cx);
-      var dist = Math.min(5, Math.hypot(mouseX-entry.cx, mouseY-entry.cy)/12);
+      var dist = Math.min(8, Math.hypot(mouseX-entry.cx, mouseY-entry.cy)/12);
       entry.pupil.style.transform = 'translate(calc(-50% + '+(Math.cos(angle)*dist)+'px), calc(-50% + '+(Math.sin(angle)*dist)+'px))';
     }
     window.addEventListener('mousemove', function(e){
@@ -204,10 +204,10 @@
     lastFrame = ts;
     ctx.fillStyle = 'rgba(10,13,18,0.08)';
     ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = '#34d399';
     ctx.font = '14px monospace';
     for(var i=0;i<drops.length;i++){
       var ch = chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillStyle = Math.random() > 0.97 ? '#ff3b3b' : '#34d399';
       ctx.fillText(ch, i*16, drops[i]*16);
       if(drops[i]*16 > canvas.height && Math.random()>0.975) drops[i]=0;
       drops[i]++;
@@ -275,5 +275,8 @@
   }
   document.getElementById('download-cv').addEventListener('click', downloadPDF);
   document.getElementById('download-cv-2').addEventListener('click', downloadPDF);
+
+  /* ---------- DISABLE RIGHT-CLICK ---------- */
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 
 })();

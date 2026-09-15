@@ -42,28 +42,31 @@
     setTimeout(function(){ r.remove(); }, 650);
   });
 
-  /* ---------- WATCHING EYES ---------- */
-  var pupil1 = document.getElementById('pupil1');
-  var pupil2 = document.getElementById('pupil2');
-  var pupil3 = document.getElementById('pupil3');
-  var pupil4 = document.getElementById('pupil4');
-  if(pupil1 && pupil2){
-    var eyeCenters = [];
-    function cacheEyeCenters(){
-      eyeCenters = [pupil1,pupil2,pupil3,pupil4].filter(Boolean).map(function(p){
-        var rect = p.parentElement.getBoundingClientRect();
-        return { pupil:p, cx: rect.left+rect.width/2, cy: rect.top+rect.height/2 };
-      });
-    }
-    cacheEyeCenters();
-    window.addEventListener('resize', cacheEyeCenters);
-    function moveEye(entry, mouseX, mouseY){
-      var angle = Math.atan2(mouseY-entry.cy, mouseX-entry.cx);
-      var dist = Math.min(8, Math.hypot(mouseX-entry.cx, mouseY-entry.cy)/12);
-      entry.pupil.style.transform = 'translate(calc(-50% + '+(Math.cos(angle)*dist)+'px), calc(-50% + '+(Math.sin(angle)*dist)+'px))';
-    }
+  /* ---------- CAMERA-APERTURE EYES ---------- */
+  var pupil1 = document.getElementById('pupil1'); // .iris element, bottom-right eye
+  var pupil3 = document.getElementById('pupil3'); // .iris element, top-left eye
+  if(pupil1){
+    document.body.classList.add('eyes-open'); // start open/tracking by default
+    var irises = [pupil1, pupil3].filter(Boolean);
     window.addEventListener('mousemove', function(e){
-      for(var i=0;i<eyeCenters.length;i++) moveEye(eyeCenters[i], e.clientX, e.clientY);
+      var xPercent = (e.clientX / window.innerWidth) * 100;
+      var yPercent = (e.clientY / window.innerHeight) * 100;
+      // damped so the small eye's iris doesn't swing wildly off-center at this scale
+      var top = (yPercent - 50) * 0.4;
+      var left = (xPercent - 50) * 0.4;
+      for(var i=0;i<irises.length;i++){
+        irises[i].style.top = top + '%';
+        irises[i].style.left = left + '%';
+      }
+    });
+    // Shutter: close when the cursor leaves the page, open + resume tracking when it returns
+    document.addEventListener('mouseleave', function(){
+      document.body.classList.remove('eyes-open');
+      document.body.classList.add('eyes-closed');
+    });
+    document.addEventListener('mouseenter', function(){
+      document.body.classList.remove('eyes-closed');
+      document.body.classList.add('eyes-open');
     });
   }
 
